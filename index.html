@@ -1,1 +1,1584 @@
-console.log("Hello via Bun!");
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAPUR ILMU — Bahan Ajar Interaktif Industri Kuliner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;900&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      width: 100vw; height: 100vh;
+      overflow: hidden; margin: 0; padding: 0;
+      background-color: #fdf6ee;
+    }
+
+    body{
+    font-family:'Inter',sans-serif;
+    }
+    .hero-title,.nav-title,.section-title,.mod-title{
+    font-family:'Syne',sans-serif;
+    }
+    #section-thumbnail, #section-intro {
+      position: absolute; top: 0; left: 0;
+      width: 100vw; height: 100vh; overflow: hidden;
+    }
+    .fade-in { animation: fadeIn 0.8s forwards; }
+    .fade-out { animation: fadeOut 0.5s forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    .btn-start, .btn-custom { animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #e53e3e; --red-dark: #c53030; --orange: #dd6b20;
+      --amber: #d69e2e; --dark: #1a1a1a;
+      --brown: #7B3F00; --brown2: #5a2d00;
+      --cream: #FFF8F0; --cream2: #f0e6d3;
+      --border: #e2c9a8;
+      --text-mid: #5a4033; --text-light: #8a6a55;
+      --orange-light: #fff3e8; --orange-dark: #c05621;
+      --card-bg: #fffaf5;
+    }
+
+    /* ===== THUMBNAIL ===== */
+    .body-thumb { font-family: "Inter", sans-serif; background: #fdf6ee; }
+    .hero-landing { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+.hero-bg-gradient {
+  position: absolute; 
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+    url("https://images.unsplash.com/photo-1504674900247-0877df9cc836");
+  background-position: center 60%;
+  background-size: cover;
+  z-index: 0;
+
+  /* GANTI UTAMA DI SINI: Menggunakan filter biasa */
+  filter: blur(4px); 
+  
+  /* TIPS TAMBAHAN: Kebanyakan efek blur di pinggir layar akan memunculkan garis putih samar. 
+     Gunakan transform scale sedikit untuk menutupinya jika itu terjadi */
+  transform: scale(1.05); 
+}
+    /* decorative shapes */
+    .hero-deco {
+      position: absolute; inset: 0; z-index: 1; overflow: hidden;
+    }
+    .hero-deco::before {
+      content: '';
+      position: absolute; width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(229,62,62,0.12) 0%, transparent 70%);
+      top: -80px; right: 10%;
+    }
+    .hero-deco::after {
+      content: '';
+      position: absolute; width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(214,158,46,0.15) 0%, transparent 70%);
+      bottom: 5%; left: 5%;
+    }
+
+    .board-content {
+      position: absolute; top: 5%; left: 50%; transform: translateX(-50%);
+      width: 80%; max-width: 860px;
+      z-index: 2; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 3% 5% 2%; gap: 12px; text-align: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(229,62,62,0.12); border: 1.5px solid rgba(229,62,62,0.4);
+      border-radius: 999px; padding: 4px 14px;
+      font-size: clamp(9px, 0.85vw, 12px); font-weight: 700;
+      color: #c53030; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .hero-title {
+      font-family: "Syne", sans-serif;
+      font-size: clamp(28px, 5.5vw, 72px);
+      font-weight: 900; line-height: 1.1; color: #3d1a0a;
+    }
+    .hero-title .accent {
+      color: var(--red-dark); display: block;
+      font-size: clamp(20px, 3.5vw, 46px);
+    }
+    .hero-subtitle {
+      font-family: "Syne", sans-serif;
+      font-size: clamp(13px, 1.8vw, 22px);
+      font-weight: 700; color: #6b3a2a; text-transform: uppercase;
+    }
+    .hero-desc {
+      font-family: "Inter", sans-serif;
+      font-size: clamp(11px, 1.1vw, 14px); color: #92716a;
+      line-height: 1.6; max-width: 600px;
+    }
+    /* food illustrations */
+    .food-grid {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; justify-content: space-around; align-items: flex-end;
+      padding: 0 3%; z-index: 1; pointer-events: none;
+    }
+    .food-item {
+      font-size: clamp(30px, 5vw, 72px);
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
+      animation: float 3s ease-in-out infinite;
+    }
+    .food-item:nth-child(2) { animation-delay: 0.5s; }
+    .food-item:nth-child(3) { animation-delay: 1s; }
+    .food-item:nth-child(4) { animation-delay: 1.5s; }
+    .food-item:nth-child(5) { animation-delay: 0.3s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .btn-area {
+      position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%);
+      z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .laptop-label { font-size: clamp(9px, 0.9vw, 12px); color: #a8826e; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+    .btn-start {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--red); color: white;
+      font-family: "Syne", sans-serif;
+      font-size: clamp(12px, 1.3vw, 16px); font-weight: 900;
+      padding: clamp(12px, 1.5vh, 18px) clamp(24px, 3vw, 36px);
+      border-radius: 12px; border: none; cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 6px 24px -4px rgba(229,62,62,0.5);
+    }
+    .btn-start:hover { background: #c53030; transform: translateY(-2px) scale(1.04); }
+    .scroll-hint {
+      position: absolute; bottom: 18px; left: 32px; z-index: 2;
+      display: flex; align-items: center; gap: 10px;
+      color: #a8826e; font-size: 10px; font-weight: 600; text-transform: uppercase;
+    }
+    .scroll-hint::before { content: ''; display: block; width: 28px; height: 1px; background: #d4b99e; }
+
+    /* ===== INTRO ===== */
+    .page-intro { display: none; justify-content: center; align-items: center; background: linear-gradient(135deg, #fff5e6, #ffecda); }
+    .bg-wrapper {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 30px; padding: 40px; max-width: 620px; width: 90%;
+    }
+    .bubble-text-area {
+      background: white; border-radius: 24px; padding: 32px 36px;
+      box-shadow: 0 8px 32px rgba(180,80,20,0.12);
+      font-family: "Inter", sans-serif;
+      font-size: clamp(14px, 1.5vw, 18px); color: var(--brown);
+      line-height: 1.7; text-align: center; position: relative;
+      border: 2px solid rgba(229,62,62,0.2);
+    }
+    .bubble-text-area::before {
+      content: '🍽️';
+      position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+      font-size: 36px;
+    }
+    .button-container-intro { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .btn-custom {
+      font-family: "Syne", sans-serif; font-weight: 800;
+      font-size: clamp(12px, 1.2vw, 15px);
+      padding: 13px 30px; border-radius: 12px; border: none;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-masuk-custom { background: var(--red); color: white; box-shadow: 0 4px 16px rgba(229,62,62,0.3); }
+    .btn-masuk-custom:hover { background: var(--red-dark); transform: translateY(-2px); }
+    .btn-kembali-custom { background: white; color: var(--brown); border: 2px solid var(--border); }
+    .btn-kembali-custom:hover { background: var(--cream2); }
+
+    /* ===== NAVBAR ===== */
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 60px;
+      background: white; border-bottom: 1.5px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(180,80,20,0.07);
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-logo {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--red), var(--orange));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .nav-title { font-family: "Syne", sans-serif; font-size: 15px; font-weight: 900; color: var(--dark); }
+    .nav-title span { color: var(--red); }
+    .nav-sub { font-size: 10px; color: var(--text-light); font-weight: 600; }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-link {
+      padding: 6px 13px; border-radius: 8px; border: none; background: none;
+      font-size: 12px; font-weight: 600; color: var(--text-mid);
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-link:hover { background: var(--cream2); color: var(--brown); }
+    .nav-link.active { background: rgba(229,62,62,0.1); color: var(--red-dark); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .badge-poin {
+      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+      border: 1.5px solid var(--amber); border-radius: 999px;
+      padding: 4px 12px; font-size: 12px; font-weight: 700; color: #b7791f;
+    }
+    .user-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--cream2); border-radius: 999px;
+      padding: 4px 12px 4px 4px; font-size: 12px; font-weight: 600; color: var(--brown);
+    }
+    .user-ava {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--red), var(--orange));
+      color: white; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ===== HERO DASHBOARD ===== */
+    .hero {
+      background: linear-gradient(135deg, #3d1a0a 0%, #7B3F00 50%, #c05621 100%);
+background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+    url("https://images.unsplash.com/photo-1504674900247-0877df9cc836");
+      background-position: center 60%;
+      background-size: cover;
+      padding: 40px 36px 36px; color: white; transition: all 0.4s ease;
+    }
+    .hero.hide-hero { display: none; }
+    .hero-tag {
+      display: inline-block; background: rgba(255,255,255,0.15);
+      border-radius: 999px; padding: 4px 14px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; margin-bottom: 12px; color: rgba(255,255,255,0.85);
+    }
+    .hero h1 {
+      font-family: "Syne", sans-serif;
+      font-size: clamp(22px, 3vw, 38px);
+      font-weight: 900; margin-bottom: 8px;
+    }
+    .hero h1 span { color: #ffd080; }
+    .hero-sub { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 24px; }
+    .hero-row { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+    .progress-wrap { flex: 1; min-width: 200px; }
+    .progress-label { font-size: 12px; font-weight: 600; margin-bottom: 8px; color: rgba(255,255,255,0.8); }
+    .progress-bar-bg { height: 10px; background: rgba(255,255,255,0.2); border-radius: 99px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #ffd080, #ff8c42); border-radius: 99px; width: 0%; transition: width 0.6s ease; }
+    .progress-count { font-size: 13px; margin-top: 8px; font-weight: 600; }
+    .progress-count span { opacity: 0.7; font-weight: 400; }
+    .hero-stats { display: flex; gap: 14px; }
+    .stat-box { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 14px 20px; text-align: center; min-width: 80px; }
+    .stat-num { font-family: "Syne", sans-serif; font-size: 26px; font-weight: 900; }
+    .stat-lbl { font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content { padding: 28px 28px 40px; background: #f7f0e8; min-height: calc(100vh - 60px - 170px); }
+    .section-header { margin-bottom: 20px; transition: all 0.3s ease; }
+    .section-header.hide-sec { display: none; }
+    .section-title { font-family: "Syne", sans-serif; font-size: 18px; font-weight: 800; color: var(--brown); }
+    .section-sub { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+
+    /* ===== MODULE GRID ===== */
+.modules-grid{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+    justify-content: center;
+    align-items: stretch;
+    padding: 30px;
+}
+
+.module-card{
+  background:linear-gradient(145deg,#fffdf8,#fff6ec);
+  border-radius:24px;
+  overflow:hidden;
+  transition:all .35s ease;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+      width:100%;
+    min-height:190px;
+    padding: 20px;
+    
+}
+
+.module-card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 18px 40px rgba(217,119,6,.2);
+}
+    .module-card.active-module {
+      grid-column: 1 / -1; cursor: default;
+      box-shadow: 0 8px 32px rgba(180,80,20,0.12); border-color: var(--orange);
+      padding: 24px;
+    }
+    /* Menyembunyikan tombol aksi bawaan modul ketika modul sedang dibuka/aktif */
+.active-module .mod-action {
+  display: none !important;
+}
+    .module-card.fade-out { opacity: 0; pointer-events: none; position: absolute; }
+    .mod-badge {
+      position: absolute; top: 14px; right: 14px;
+      font-size: 10px; font-weight: 700; padding: 3px 9px;
+      border-radius: 999px; text-transform: uppercase;
+    }
+    .badge-new { background: rgba(229,62,62,0.1); color: var(--red-dark); }
+    .badge-lock { background: rgba(214,158,46,0.15); color: #b7791f; }
+    .mod-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 12px;
+    }
+    .mod-num { font-size: 10px; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .mod-title { font-family: "Syne", sans-serif; font-size: 16px; font-weight: 800; color: var(--brown); margin: 4px 0 8px; }
+    .mod-desc { font-size: 12px; color: var(--text-light); line-height: 1.6; }
+    .mod-action {
+      margin-top: 14px; padding: 8px 16px;
+      background: var(--cream2); border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: 12px; font-weight: 700;
+      color: var(--brown); cursor: pointer; transition: all 0.2s; display: inline-block;
+    }
+    .module-card:hover .mod-action { background: var(--red); color: white; border-color: var(--red); }
+    .module-content-area { display: none; margin-top: 0; }
+    .active-module .module-content-area { display: block; }
+    .btn-back-dashboard {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--cream2); border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 9px 18px;
+      font-size: 13px; font-weight: 700; color: var(--brown);
+      cursor: pointer; transition: all 0.2s; margin-bottom: 20px; margin-top: 20px;
+    }
+    .btn-back-dashboard:hover { background: var(--red); color: white; border-color: var(--red); }
+
+    /* ===== BOTTOM ROW ===== */
+
+
+    /* Container untuk judul dalam modul dan tombol kembali */
+.mod-inside-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* Mengatur susunan teks Modul 01 dan Nama Kompetensi */
+.mod-inside-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.mod-inside-title .num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.mod-inside-title h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--brown);
+  margin-top: 2px;
+}
+
+/* Desain baru tombol kembali yang sejajar di kanan */
+.btn-back-dashboard-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--cream2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brown);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap; /* Mencegah tombol tertekuk ke bawah */
+}
+
+.btn-back-dashboard-inline:hover {
+  background: var(--red);
+  color: white;
+  border-color: var(--red);
+}
+    .bottom-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+      transition: all 0.3s ease;
+    }
+    .bottom-row.hide-sec { display: none; }
+    .info-card { background: white; border-radius: 16px; padding: 22px; border: 1.5px solid var(--border); }
+    .info-card-title { font-family: "Syne", sans-serif; font-size: 14px; font-weight: 800; color: var(--brown); margin-bottom: 14px; }
+    .cp-list, .tp-list { display: flex; flex-direction: column; gap: 10px; }
+    .cp-item, .tp-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-mid); line-height: 1.5; }
+    .cp-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-top: 5px; }
+    .tp-num { width: 20px; height: 20px; border-radius: 6px; background: rgba(229,62,62,0.1); color: var(--red-dark); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-light);
+
+      margin-top: auto; /* mendorong footer ke bawah */
+    }
+    /* ===== TWO COLUMN LAYOUT ===== */
+    .two-column { display: grid; grid-template-columns: 200px 1fr; gap: 20px; margin-top: 0; }
+    .side-menu { display: flex; flex-direction: column; gap: 6px; }
+    .side-btn {
+      padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: var(--cream); font-size: 13px; font-weight: 600;
+      color: var(--text-mid); cursor: pointer; text-align: left;
+      transition: all 0.2s;
+    }
+    .side-btn:hover { border-color: var(--orange); color: var(--brown); }
+    .side-btn.active-tab { background: rgba(229,62,62,0.08); border-color: var(--red); color: var(--red-dark); font-weight: 700; }
+    .content-box {
+      background: white; border-radius: 14px; padding: 24px;
+      border: 1.5px solid var(--border); min-height: 240px;
+      font-size: 14px; color: var(--text-mid); line-height: 1.8;
+    }
+    .content-box h2 { font-family: "Syne", sans-serif; font-size: 18px; font-weight: 800; color: var(--brown); margin-bottom: 12px; }
+    .content-box h3 { font-family: "Syne", sans-serif; font-size: 15px; font-weight: 700; color: var(--brown); margin: 16px 0 8px; }
+    .content-box p { margin-bottom: 12px; }
+    .content-box ul, .content-box ol { padding-left: 20px; }
+    .content-box li { margin-bottom: 8px; }
+    .content-box strong { color: var(--brown); }
+    @keyframes contentReveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .anim-fade { animation: contentReveal 0.35s ease; }
+
+    /* ===== MATERI TABS ===== */
+    .materi-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tab-btn {
+      padding: 8px 18px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: var(--cream); font-size: 13px; font-weight: 600;
+      color: var(--text-mid); cursor: pointer; transition: all 0.2s;
+    }
+    .tab-btn:hover { border-color: var(--red); color: var(--brown); }
+    .tab-btn.active-tab { background: rgba(229,62,62,0.1); border-color: var(--red); color: var(--red-dark); font-weight: 700; }
+
+    /* ===== QUIZ ===== */
+    .quiz-overlay { animation: contentReveal 0.4s ease; }
+    .quiz-btn {
+      margin-top: 16px; padding: 10px 20px;
+      background: var(--red); color: white; border: none; border-radius: 10px;
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .quiz-btn:hover { background: var(--red-dark); transform: translateY(-2px); }
+    .quiz-q { font-size: 15px; font-weight: 700; color: var(--brown); margin-bottom: 14px; line-height: 1.5; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opt {
+      padding: 12px 16px; border: 1.5px solid var(--border);
+      border-radius: 10px; background: var(--cream);
+      cursor: pointer; font-size: 13px; color: var(--text-mid);
+      text-align: left; transition: all 0.2s;
+    }
+    .quiz-opt:hover { border-color: var(--orange); background: var(--orange-light); transform: translateX(4px); }
+    .quiz-opt.selected { border-color: var(--orange); background: var(--orange-light); color: var(--orange-dark); font-weight: 600; }
+    .quiz-opt.correct { border-color: #2E7D32; background: #E8F5E9; color: #2E7D32; }
+    .quiz-opt.wrong { border-color: #C62828; background: #FFEBEE; color: #C62828; }
+    .quiz-submit {
+      background: var(--brown); color: white; border: none; border-radius: 10px;
+      padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .quiz-submit:hover { background: var(--brown2); transform: translateY(-2px); }
+    .quiz-nav { display: flex; gap: 10px; margin-top: 14px; }
+    .quiz-score-box {
+      background: linear-gradient(135deg, #FFF5E6, #FFE8CC);
+      border: 2px solid var(--orange); border-radius: 16px; padding: 28px;
+      text-align: center; animation: contentReveal 0.5s ease;
+    }
+    .quiz-score-box .score-num { font-size: 54px; font-weight: 800; color: var(--red); line-height: 1; }
+    .quiz-score-box .score-label { font-size: 14px; color: var(--text-mid); margin-top: 6px; }
+    .quiz-score-box .score-msg { font-size: 18px; font-weight: 700; color: var(--brown); margin-top: 10px; }
+    .career-progress-bar { height: 6px; background: var(--cream2); border-radius: 6px; overflow: hidden; margin-bottom: 24px; }
+    .career-progress-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--orange)); border-radius: 6px; transition: width 0.4s ease; }
+    .career-q-num { font-size: 12px; font-weight: 700; color: var(--text-light); letter-spacing: 0.5px; }
+
+    /* ===== SWIPE KULINER ===== */
+    .swipe-wrapper { display: flex; flex-direction: column; gap: 20px; }
+    .swipe-cards-row {
+      display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+      min-height: 80px; padding: 16px;
+      background: var(--cream); border: 2px dashed var(--border); border-radius: 14px;
+    }
+    .job-card {
+      background: white; border: 2px solid var(--orange); border-radius: 12px;
+      padding: 10px 12px; cursor: grab; font-size: 12px; font-weight: 600;
+      color: var(--brown); display: flex; flex-direction: column;
+      align-items: center; gap: 4px; min-width: 110px; text-align: center;
+      transition: all 0.2s; user-select: none;
+    }
+    .job-card:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 8px 20px rgba(180,80,20,0.2); }
+    .job-card:active { cursor: grabbing; }
+    .job-card .job-icon { font-size: 22px; }
+    .job-card .job-illus { width: 56px; height: 56px; border-radius: 10px; overflow: hidden; background: var(--cream); display: flex; align-items: center; justify-content: center; margin-bottom: 2px; }
+    .job-card .job-illus svg { width: 52px; height: 52px; }
+    .job-card.dragging { opacity: 0.5; transform: scale(0.95); }
+    .drop-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .dropzone {
+      min-height: 180px; border: 2.5px dashed var(--border); border-radius: 14px;
+      padding: 16px; background: var(--cream); transition: all 0.2s; position: relative;
+    }
+    .dropzone.kini { border-color: #1565C0; background: #E3F2FD; }
+    .dropzone.depan { border-color: #6A1B9A; background: #F3E5F5; }
+    .dropzone.drag-over { transform: scale(1.02); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .dropzone-label { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .dropzone.kini .dropzone-label { color: #1565C0; }
+    .dropzone.depan .dropzone-label { color: #6A1B9A; }
+    .dropzone-items { display: flex; flex-wrap: wrap; gap: 8px; }
+    .swipe-check-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--brown); color: white; border: none; border-radius: 12px;
+      padding: 13px 28px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.25s; margin-top: 4px;
+    }
+    .swipe-check-btn:hover { background: var(--brown2); transform: translateY(-2px); }
+    .swipe-result { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; animation: contentReveal 0.4s ease; }
+    .swipe-result-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 16px; border-radius: 12px; border: 1.5px solid;
+    }
+    .swipe-result-item.correct { background: #E8F5E9; border-color: #2E7D32; }
+    .swipe-result-item.wrong { background: #FFEBEE; border-color: #C62828; }
+    .swipe-result-item .res-icon { font-size: 20px; }
+    .swipe-result-item .res-title { font-size: 13px; font-weight: 700; color: var(--brown); }
+    .swipe-result-item .res-exp { font-size: 12px; color: var(--text-mid); margin-top: 3px; line-height: 1.5; }
+    .swipe-result-item.correct .res-title { color: #2E7D32; }
+    .swipe-result-item.wrong .res-title { color: #C62828; }
+
+    /* ===== CAREER MATCH ===== */
+    .career-q-text { font-size: 15px; font-weight: 700; color: var(--brown); margin-bottom: 18px; line-height: 1.5; }
+    .career-options { display: flex; flex-direction: column; gap: 10px; }
+    .career-opt {
+      padding: 13px 18px; border: 1.5px solid var(--border); border-radius: 12px;
+      background: var(--cream); cursor: pointer; font-size: 13px;
+      color: var(--text-mid); text-align: left; transition: all 0.2s;
+    }
+    .career-opt:hover { border-color: var(--orange); background: var(--orange-light); transform: translateX(4px); }
+    .career-opt.selected { border-color: var(--orange); background: var(--orange-light); color: var(--orange-dark); font-weight: 600; }
+    .career-result-card {
+      background: linear-gradient(135deg, #FFF5E6, #FFE8CC);
+      border: 2px solid var(--orange); border-radius: 20px; padding: 28px;
+      text-align: center; animation: contentReveal 0.5s ease;
+    }
+    .career-result-icon { font-size: 52px; margin-bottom: 12px; }
+    .career-result-title { font-family: "Syne", sans-serif; font-size: 22px; font-weight: 900; color: var(--brown); }
+    .career-result-sub { font-size: 13px; color: var(--text-light); margin-top: 6px; line-height: 1.6; }
+    .career-result-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+    .career-tag { padding: 5px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .tag-red { background: rgba(229,62,62,0.1); color: var(--red-dark); }
+    .tag-orange { background: rgba(221,107,32,0.1); color: var(--orange); }
+    .tag-amber { background: rgba(214,158,46,0.12); color: #b7791f; }
+    .career-next-btn {
+      margin-top: 20px; padding: 12px 28px;
+      background: var(--red); color: white; border: none; border-radius: 12px;
+      font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+    }
+    .career-next-btn:hover { background: var(--red-dark); transform: translateY(-2px); }
+
+    /* ===== PROFIL ===== */
+    .profil-page {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 30px 20px; gap: 16px;
+    }
+    .profil-avatar {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--red), var(--orange));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 38px; box-shadow: 0 8px 24px rgba(229,62,62,0.3);
+    }
+    .profil-name { font-family: "Syne", sans-serif; font-size: 22px; font-weight: 900; color: var(--brown); }
+    .profil-role { font-size: 13px; color: var(--text-light); }
+    .profil-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 560px; margin-top: 8px; }
+    .profil-info-item { background: var(--cream); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 18px; }
+    .profil-info-label { font-size: 11px; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .profil-info-value { font-size: 13px; font-weight: 600; color: var(--brown); }
+  </style>
+</head>
+<body>
+
+<!-- THUMBNAIL -->
+<div id="section-thumbnail" class="body-thumb">
+  <div class="hero-landing">
+    <div class="hero-bg-gradient"></div>
+    <div class="hero-deco"></div>
+
+    <div class="board-content">
+      <div class="eyebrow">🏫 SMK · Tata Boga &amp; Kuliner</div>
+      <h1 class="hero-title">
+        Eksplorasi
+        <span class="accent">DUNIA KULINER INDONESIA 🍳</span>
+      </h1>
+      <h2 class="hero-subtitle">Bahan Ajar Interaktif · Ruang Lingkup Bisnis Industri Kuliner</h2>
+      <p class="hero-desc">Pelajari definisi, klasifikasi, dan alur bisnis industri kuliner secara interaktif, lengkap dengan kuis, simulasi, dan tes karier kuliner.</p>
+    </div>
+
+    <div class="food-grid">
+      <div class="food-item">🍜</div>
+      <div class="food-item">🎂</div>
+      <div class="food-item">🍱</div>
+      <div class="food-item">🥘</div>
+      <div class="food-item">🍕</div>
+    </div>
+
+    <div class="btn-area">
+      <span class="laptop-label">Siap belajar?</span>
+      <button class="btn-start" onclick="pindahKeIntro()">Mulai Belajar! →</button>
+    </div>
+
+    <div class="scroll-hint">Dapur Ilmu — Bahan Ajar Interaktif Kuliner</div>
+  </div>
+</div>
+
+<!-- INTRO -->
+<div id="section-intro" class="page-intro">
+  <div class="bg-wrapper">
+    <div class="bubble-text-area">
+      <p id="typing-text"></p>
+    </div>
+    <div class="button-container-intro">
+      <button class="btn-custom btn-masuk-custom" onclick="aksiMasuk()">MASUK →</button>
+      <button class="btn-custom btn-kembali-custom" onclick="pindahKeThumbnail()">← Kembali</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" style="display:none; width:100vw; height:100vh; overflow-y:auto;">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">🍳</div>
+      <div>
+        <div class="nav-title">RACIK <span>KULINER</span></div>
+        <div class="nav-sub">SMK · Tata Boga &amp; Kuliner</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="setNav(this); backDashboard()">🏠 Dashboard</button>
+      <button class="nav-link" onclick="setNav(this); openModule(0)">📋 Kompetensi</button>
+      <button class="nav-link" onclick="setNav(this); openModule(1)">📚 Materi</button>
+      <button class="nav-link" onclick="setNav(this); openModule(2)">🧩 Klasifikasi Kuliner</button>
+      <button class="nav-link" onclick="setNav(this); openModule(5)">💰 Simulasi Bisnis</button>
+      <button class="nav-link" onclick="setNav(this); openModule(3)">🎯 Profil Kuliner</button>
+      <button class="nav-link" onclick="setNav(this); openModule(4)">👤 Profil Pembuat</button>
+    </div>
+    <div class="nav-right">
+      <div class="badge-poin">⭐ <span id="poin-val">0</span> Poin</div>
+      <div class="user-chip"><div class="user-ava">S</div>Siswa</div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero" id="hero-section">
+    <div class="hero-tag">SMK · Tata Boga &amp; Kuliner</div>
+    <h1>Selamat Datang di <span>Racik kuliner 🍳</span></h1>
+    <p class="hero-sub">Bahan Ajar Interaktif · Ruang Lingkup Bisnis Industri Kuliner<br>Rancang, Analisis, Cipta, Industri Kuliner</p>
+    <div class="hero-row">
+      <div class="progress-wrap">
+        <div class="progress-label">Progres Pembelajaran Mandiri</div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+        <div class="progress-count" id="progress-text">0 <span>/ 5 Modul Tuntas</span></div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-box"><div class="stat-num" id="stat-selesai">0</div><div class="stat-lbl">Kuis Selesai</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-poin">0</div><div class="stat-lbl">Total Poin</div></div>
+        <div class="stat-box"><div class="stat-num">5</div><div class="stat-lbl">Total Modul</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+    <div class="section-header" id="section-header">
+      <div class="section-title">📌 Peta Kemajuan Pembelajaran Mandiri</div>
+      <p class="section-sub">Pilih modul untuk melihat detail alur pembelajaran. Selesaikan secara berurutan untuk membuka modul berikutnya.</p>
+    </div>
+
+    <div class="modules-grid" id="modules-grid">
+
+      <div class="module-card" id="card-0" onclick="openModule(0)">
+        <!-- <div class="mod-badge badge-new" id="badge-0">Mulai</div> -->
+        <div class="mod-icon" style="background:#FFF3E0;">📋</div>
+        <div class="mod-num">Modul 01</div>
+        <div class="mod-title">Kompetensi</div>
+        <div class="mod-desc">Petunjuk, Capaian Pembelajaran, dan Tujuan Pembelajaran bisnis industri kuliner.</div>
+        <button class="mod-action">Buka Panduan →</button>
+        <div class="module-content-area" id="content-0"></div>
+      </div>
+
+      <div class="module-card" id="card-1" onclick="openModule(1)">
+        <!-- <div class="mod-badge badge-new" id="badge-1">3 Topik</div> -->
+        <div class="mod-icon" style="background:#FFF8E1;">📚</div>
+        <div class="mod-num">Modul 02</div>
+        <div class="mod-title"></div>
+        <div class="mod-desc">Definisi, klasifikasi, prinsip dan alur bisnis industri kuliner beserta kuis interaktif.</div>
+        <button class="mod-action">Belajar Materi →</button>
+        <div class="module-content-area" id="content-1"></div>
+      </div>
+
+      <div class="module-card" id="card-2" onclick="openModule(2)">
+        <!-- <div class="mod-badge badge-lock" id="badge-2">✨ Siap</div> -->
+        <div class="mod-icon" style="background:#E8F5E9;">🧩</div>
+        <div class="mod-num">Modul 03</div>
+        <div class="mod-title">Klasifikasi Kuliner</div>
+        <div class="mod-desc">Klasifikasi usaha kuliner dengan area drag &amp; drop interaktif dan validasi jawaban.</div>
+        <button class="mod-action">Mulai Simulasi →</button>
+        <div class="module-content-area" id="content-2"></div>
+      </div>
+
+      <div class="module-card" id="card-5" onclick="openModule(5)">
+        <!-- <div class="mod-badge badge-new">NEW</div> -->
+        <div class="mod-icon" style="background:#FFF3E0;">💰</div>
+        <div class="mod-num">Modul 06</div>
+        <div class="mod-title">Simulasi Bisnis</div>
+        <div class="mod-desc">
+          Bangun bisnis kulinermu sendiri: pilih modal, menu, lokasi, dan strategi.
+        </div>
+        <button class="mod-action">Mulai Simulasi →</button>
+        <div class="module-content-area" id="content-5"></div>
+      </div>
+
+      <div class="module-card" id="card-3" onclick="openModule(3)">
+        <!-- <div class="mod-badge badge-lock" id="badge-3">✨ Siap</div> -->
+        <div class="mod-icon" style="background:#F3E5F5;">🎯</div>
+        <div class="mod-num">Modul 04</div>
+        <div class="mod-title">Profil Kuliner</div>
+        <div class="mod-desc">Tes karakter dan temukan profil karier kuliner yang paling sesuai denganmu.</div>
+        <button class="mod-action">Mulai Tes →</button>
+        <div class="module-content-area" id="content-3"></div>
+      </div>
+
+      <div class="module-card" id="card-4" onclick="openModule(4)">
+        <!-- <div class="mod-badge badge-lock" id="badge-4">✨ Siap</div> -->
+        <div class="mod-icon" style="background:#E8EAF6;">👤</div>
+        <div class="mod-num">Modul 05</div>
+        <div class="mod-title">Profil Pembuat</div>
+        <div class="mod-desc">Informasi profil, instansi, dan latar belakang pengembang media pembelajaran ini.</div>
+        <button class="mod-action">Lihat Profil →</button>
+        <div class="module-content-area" id="content-4"></div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM INFO -->
+    <div class="bottom-row" id="bottom-row">
+      <div class="info-card">
+        <div class="info-card-title">📌 Capaian Pembelajaran (CP)</div>
+        <div class="cp-list">
+          <div class="cp-item"><div class="cp-dot"></div>Memahami definisi dan ruang lingkup bisnis industri kuliner</div>
+          <div class="cp-item"><div class="cp-dot"></div>Mengidentifikasi klasifikasi dan jenis usaha industri kuliner</div>
+          <div class="cp-item"><div class="cp-dot"></div>Menganalisis prinsip dan alur bisnis industri kuliner</div>
+          <div class="cp-item"><div class="cp-dot"></div>Mengklasifikasikan usaha kuliner berdasarkan kategorinya</div>
+          <div class="cp-item"><div class="cp-dot"></div>Mencocokkan karakter diri dengan profil karier di industri kuliner</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">🎯 Tujuan Pembelajaran (TP)</div>
+        <div class="tp-list">
+          <div class="tp-item"><div class="tp-num">1</div>Mendeskripsikan pengertian bisnis industri kuliner</div>
+          <div class="tp-item"><div class="tp-num">2</div>Mengklasifikasikan jenis-jenis usaha industri kuliner</div>
+          <div class="tp-item"><div class="tp-num">3</div>Menjelaskan prinsip dan alur bisnis industri kuliner</div>
+          <div class="tp-item"><div class="tp-num">4</div>Melakukan simulasi klasifikasi usaha kuliner</div>
+          <div class="tp-item"><div class="tp-num">5</div>Menemukan profil karier kuliner yang sesuai karakter diri</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>© 2026 <strong>Dapur Ilmu</strong> · Bahan Ajar Interaktif Bisnis Industri Kuliner SMK Indonesia.</span>
+    <span>Standar Kurikulum Merdeka Vokasi</span>
+  </div>
+
+</div>
+
+<script>
+/* ===== THUMBNAIL → INTRO ===== */
+function pindahKeIntro() {
+  const thumb = document.getElementById('section-thumbnail');
+  const intro = document.getElementById('section-intro');
+  thumb.classList.add('fade-out');
+  setTimeout(() => {
+    thumb.style.display = 'none';
+    thumb.classList.remove('fade-out');
+    intro.style.display = 'flex';
+    intro.classList.add('fade-in');
+    startTyping();
+  }, 500);
+}
+function pindahKeThumbnail() {
+  const thumb = document.getElementById('section-thumbnail');
+  const intro = document.getElementById('section-intro');
+  intro.classList.add('fade-out');
+  setTimeout(() => {
+    intro.style.display = 'none';
+    intro.classList.remove('fade-out');
+    thumb.style.display = 'block';
+    thumb.classList.add('fade-in');
+  }, 500);
+}
+function startTyping() {
+  const el = document.getElementById('typing-text');
+  el.innerHTML = '';
+  const text = 'Aku siswa SMK Tata Boga, nanti bisnis kuliner apa yang cocok buatku ya? Terus gimana cara memulai usaha di industri kuliner? 🍽️';
+  let i = 0;
+  function type() {
+    if (i < text.length) { el.innerHTML += text.charAt(i); i++; setTimeout(type, 18); }
+  }
+  type();
+}
+function aksiMasuk() {
+  sessionStorage.setItem('activeView', 'dashboard');
+  const intro = document.getElementById('section-intro');
+  const dash = document.getElementById('page-dashboard');
+  intro.classList.add('fade-out');
+  setTimeout(() => {
+    intro.style.display = 'none';
+    intro.classList.remove('fade-out');
+    dash.style.display = 'block';
+    dash.classList.add('fade-in');
+  }, 500);
+}
+
+/* ===== STATE ===== */
+let currentModule = -1;
+let poin = 0;
+let completedModules = new Set();
+
+/* ===== NAV ===== */
+function setNav(el) {
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ===== OPEN/CLOSE MODULE ===== */
+function openModule(idx){
+  if(currentModule===idx) return;
+
+  document.getElementById('hero-section').classList.add('hide-hero');
+  document.getElementById('section-header').classList.add('hide-sec');
+  document.getElementById('bottom-row').classList.add('hide-sec');
+
+  document.querySelectorAll('.module-card').forEach(card=>{
+      card.classList.remove('active-module','fade-out');
+      card.style.display='none';
+  });
+
+  const activeCard=document.getElementById('card-'+idx);
+  activeCard.style.display='block';
+  activeCard.classList.add('active-module');
+
+  currentModule=idx;
+
+  // Ambil teks judul asli dari kartu modul sebelum di-overwrite
+  const modNum = activeCard.querySelector('.mod-num').innerText;
+  const modTitle = activeCard.querySelector('.mod-title').innerText;
+
+  const content=document.getElementById('content-'+idx);
+  
+  // Membuat susunan header baru: Judul di kiri, Tombol Kembali di kanan
+  const moduleHeader = `
+    <div class="mod-inside-header">
+      <div class="mod-inside-title">
+        <span class="num">${modNum}</span>
+        <h2>${modTitle}</h2>
+      </div>
+      <button class="btn-back-dashboard-inline" onclick="event.stopPropagation(); backDashboard()">
+        ← Kembali ke Dashboard
+      </button>
+    </div>
+  `;
+
+  content.innerHTML = moduleHeader + buildModuleContent(idx);
+
+  if(idx===2) setTimeout(initSwipe,100);
+}
+
+function backDashboard(){
+
+  document.getElementById('hero-section').classList.remove('hide-hero');
+  document.getElementById('section-header').classList.remove('hide-sec');
+  document.getElementById('bottom-row').classList.remove('hide-sec');
+
+  document.querySelectorAll('.module-card').forEach(card=>{
+      card.style.display='block';
+      card.classList.remove('active-module','fade-out');
+  });
+
+  if(currentModule>=0){
+      document.getElementById('content-'+currentModule).innerHTML='';
+  }
+
+  currentModule=-1;
+}
+
+function buildBackBtn() {
+  return `<button class="btn-back-dashboard" onclick="event.stopPropagation(); backDashboard()">← Kembali ke Dashboard</button>`;
+}
+
+function buildModuleContent(idx) {
+  switch(idx) {
+    case 0: return buildKompetensi();
+    case 1: return buildMateri();
+    case 2: return buildSwipeKuliner();
+    case 3: return buildProfilKuliner();
+    case 4: return buildProfilPembuat();
+    case 5: return buildSimulasiBisnis();
+    default: return '';
+  }
+}
+
+/* ===== MODUL 0: KOMPETENSI ===== */
+function buildKompetensi() {
+  return `
+  <div class="two-column">
+    <div class="side-menu">
+      <button class="side-btn" onclick="showKompetensi('petunjuk', this)">📖 Petunjuk</button>
+      <button class="side-btn" onclick="showKompetensi('cp', this)">📌 Capaian Pembelajaran</button>
+      <button class="side-btn" onclick="showKompetensi('tp', this)">🎯 Tujuan Pembelajaran</button>
+    </div>
+    <div class="content-box" id="box-kompetensi">
+      <h2 style="color:var(--text-light);">👈 Pilih menu di sebelah kiri</h2>
+      <p>Klik salah satu menu untuk menampilkan isinya di sini.</p>
+    </div>
+  </div>`;
+}
+
+const kompetensiData = {
+  petunjuk: `
+    <h2>📖 Petunjuk Penggunaan</h2>
+    <p>Selamat datang di media pembelajaran interaktif <strong>Dapur Ilmu</strong>. Ikuti petunjuk berikut untuk menggunakan media ini secara optimal:</p>
+    <ol>
+      <li><strong>Pelajari setiap modul secara berurutan</strong> — mulai dari Modul 01 Kompetensi hingga Modul 05 Profil Pembuat.</li>
+      <li><strong>Baca capaian dan tujuan pembelajaran</strong> sebelum memulai materi agar kamu tahu target yang ingin dicapai.</li>
+      <li><strong>Kerjakan kuis</strong> di setiap topik materi untuk menguji pemahaman dan mendapatkan poin.</li>
+      <li><strong>Mainkan Simulasi Klasifikasi Kuliner</strong> — seret kartu usaha kuliner ke kategori yang tepat.</li>
+      <li><strong>Ikuti Tes Profil Kuliner</strong> untuk menemukan karier kuliner yang paling cocok dengan karaktermu.</li>
+      <li>Selesaikan semua modul untuk mendapatkan nilai maksimal.</li>
+    </ol>`,
+  cp: `
+    <h2>📌 Capaian Pembelajaran (CP)</h2>
+    <p>Setelah menyelesaikan pembelajaran ini, peserta didik diharapkan mampu:</p>
+    <ul>
+      <li>Memahami definisi dan ruang lingkup bisnis industri kuliner secara komprehensif</li>
+      <li>Mengidentifikasi klasifikasi dan jenis-jenis usaha di industri kuliner</li>
+      <li>Menganalisis prinsip dasar dan alur operasional bisnis industri kuliner</li>
+      <li>Mengklasifikasikan usaha kuliner berdasarkan skala, jenis layanan, dan segmen pasar</li>
+      <li>Mencocokkan karakter dan potensi diri dengan karier yang tersedia di industri kuliner</li>
+    </ul>`,
+  tp: `
+    <h2>🎯 Tujuan Pembelajaran (TP)</h2>
+    <p>Melalui pembelajaran ini, peserta didik dapat:</p>
+    <ol>
+      <li>Mendeskripsikan pengertian bisnis industri kuliner dan ruang lingkupnya</li>
+      <li>Mengklasifikasikan jenis-jenis usaha industri kuliner berdasarkan kategorinya</li>
+      <li>Menjelaskan prinsip dan alur bisnis industri kuliner dari hulu ke hilir</li>
+      <li>Melakukan simulasi interaktif pengklasifikasian usaha kuliner</li>
+      <li>Merumuskan rencana karier di bidang kuliner berdasarkan tes karakter pribadi</li>
+    </ol>`
+};
+
+function showKompetensi(key, btn) {
+  const box = document.getElementById('box-kompetensi');
+  box.classList.remove('anim-fade'); void box.offsetWidth;
+  box.innerHTML = kompetensiData[key];
+  box.classList.add('anim-fade');
+  document.querySelectorAll('#content-0 .side-btn').forEach(b => b.classList.remove('active-tab'));
+  if (btn) btn.classList.add('active-tab');
+}
+
+/* ===== MODUL 1: MATERI ===== */
+function buildMateri() {
+  return `
+  <div class="two-column">
+    <div class="side-menu">
+      <button class="side-btn" onclick="showMateri('definisi', this)">🍴 Definisi Bisnis Kuliner</button>
+      <button class="side-btn" onclick="showMateri('klasifikasi', this)">🗂️ Klasifikasi &amp; Jenis</button>
+      <button class="side-btn" onclick="showMateri('prinsip', this)">⚙️ Prinsip &amp; Alur Bisnis</button>
+    </div>
+    <div class="content-box" id="box-materi">
+      <h2 style="color:var(--text-light);">👈 Pilih topik materi di sebelah kiri</h2>
+      <p>Klik salah satu topik untuk membaca materinya, lalu kerjakan kuis di akhir.</p>
+    </div>
+  </div>`;
+}
+
+const materiData = {
+  definisi: {
+    content: `
+      <h2>🍴 Definisi Bisnis Industri Kuliner</h2>
+      <p>Bisnis industri kuliner adalah kegiatan ekonomi yang mencakup seluruh proses produksi, pengolahan, penyajian, distribusi, dan penjualan produk makanan dan minuman kepada konsumen dengan tujuan memperoleh keuntungan.</p>
+      <h3>Ruang Lingkup Industri Kuliner</h3>
+      <p>Industri kuliner mencakup berbagai aktivitas yang saling berkaitan, mulai dari:</p>
+      <ul>
+        <li><strong>Pengadaan bahan baku</strong> — pemilihan dan pembelian bahan makanan berkualitas dari pemasok atau petani</li>
+        <li><strong>Pengolahan/Produksi</strong> — proses memasak, mengolah, dan menyiapkan makanan sesuai standar resep</li>
+        <li><strong>Penyajian &amp; Layanan</strong> — menghidangkan produk kuliner dengan standar estetika dan kebersihan yang tinggi</li>
+        <li><strong>Pemasaran &amp; Penjualan</strong> — mempromosikan dan menjual produk kuliner kepada konsumen sasaran</li>
+        <li><strong>Manajemen Operasional</strong> — pengelolaan SDM, keuangan, dan fasilitas usaha kuliner</li>
+      </ul>
+      <h3>Karakteristik Industri Kuliner</h3>
+      <ul>
+        <li>Produk bersifat <strong>perishable</strong> (cepat rusak), sehingga memerlukan manajemen stok yang ketat</li>
+        <li>Sangat dipengaruhi oleh <strong>tren dan selera konsumen</strong> yang terus berubah</li>
+        <li>Membutuhkan <strong>standar higienitas dan keamanan pangan</strong> (food safety) yang ketat</li>
+        <li>Memiliki <strong>nilai tambah tinggi</strong> dari kreativitas dan inovasi dalam pengolahan</li>
+      </ul>`,
+    kuis: 'k1q1'
+  },
+  klasifikasi: {
+    content: `
+      <h2>🗂️ Klasifikasi dan Jenis Industri Kuliner</h2>
+      <p>Industri kuliner diklasifikasikan berdasarkan beberapa aspek, yaitu skala usaha, jenis layanan, dan segmen pasar yang dilayani.</p>
+      <h3>A. Berdasarkan Skala Usaha</h3>
+      <ul>
+        <li><strong>Usaha Mikro Kuliner</strong> — warung makan, pedagang kaki lima, katering rumahan (omzet &lt; Rp 300 juta/tahun)</li>
+        <li><strong>Usaha Kecil Kuliner</strong> — restoran kecil, bakery lokal, catering skala kecil (omzet Rp 300 juta – 2,5 miliar/tahun)</li>
+        <li><strong>Usaha Menengah Kuliner</strong> — restoran berskala menengah, waralaba kuliner lokal</li>
+        <li><strong>Usaha Besar Kuliner</strong> — franchise internasional, hotel berbintang, perusahaan makanan industri</li>
+      </ul>
+      <h3>B. Berdasarkan Jenis Layanan</h3>
+      <ul>
+        <li><strong>Full Service Restaurant</strong> — restoran dengan pelayanan penuh dari pemesanan hingga pembayaran</li>
+        <li><strong>Quick Service / Fast Food</strong> — layanan cepat dengan menu standar (McD, KFC, dll.)</li>
+        <li><strong>Catering Service</strong> — layanan makanan untuk acara/event di luar lokasi usaha</li>
+        <li><strong>Food Truck &amp; Street Food</strong> — usaha kuliner bergerak/mobil</li>
+        <li><strong>Cloud Kitchen (Dapur Virtual)</strong> — dapur produksi khusus untuk pesanan online tanpa tempat makan di lokasi</li>
+        <li><strong>Bakery &amp; Pastry Shop</strong> — toko roti, kue, dan produk patiseri</li>
+      </ul>
+      <h3>C. Berdasarkan Segmen Pasar</h3>
+      <ul>
+        <li><strong>Kuliner Rakyat</strong> — harga terjangkau, segmen menengah ke bawah</li>
+        <li><strong>Kuliner Premium</strong> — fine dining, bahan premium, pengalaman makan mewah</li>
+        <li><strong>Kuliner Khas Daerah</strong> — makanan tradisional dengan keaslian budaya lokal</li>
+        <li><strong>Kuliner Internasional</strong> — masakan dari berbagai penjuru dunia</li>
+        <li><strong>Kuliner Khusus</strong> — vegan, halal certified, bebas gluten, organik</li>
+      </ul>`,
+    kuis: 'k1q2'
+  },
+  prinsip: {
+    content: `
+      <h2>⚙️ Prinsip dan Alur Bisnis Industri Kuliner</h2>
+      <p>Keberhasilan bisnis kuliner bergantung pada pemahaman prinsip dasar dan alur operasional yang sistematis.</p>
+      <h3>Prinsip Dasar Bisnis Kuliner</h3>
+      <ul>
+        <li><strong>Kualitas Produk</strong> — konsistensi rasa, tampilan, dan porsi adalah kunci kepercayaan pelanggan</li>
+        <li><strong>Higienitas &amp; Food Safety</strong> — kepatuhan terhadap standar keamanan pangan (HACCP, SNI)</li>
+        <li><strong>Efisiensi Biaya (Food Cost)</strong> — mengelola biaya bahan baku agar tidak melebihi 30-35% dari harga jual</li>
+        <li><strong>Kepuasan Pelanggan</strong> — layanan yang ramah, cepat, dan pengalaman makan yang menyenangkan</li>
+        <li><strong>Inovasi &amp; Kreativitas</strong> — terus berinovasi menu sesuai tren untuk mempertahankan daya saing</li>
+      </ul>
+      <h3>Alur Bisnis Industri Kuliner</h3>
+      <ol>
+        <li><strong>Perencanaan Usaha</strong> — riset pasar, penentuan konsep, dan penyusunan business plan</li>
+        <li><strong>Pengadaan Bahan Baku</strong> — seleksi supplier, pembelian, dan penyimpanan bahan baku</li>
+        <li><strong>Persiapan (Mise en Place)</strong> — mempersiapkan seluruh bahan dan peralatan sebelum operasional</li>
+        <li><strong>Produksi/Pengolahan</strong> — proses memasak sesuai standar resep (SOP produksi)</li>
+        <li><strong>Penyajian &amp; Layanan</strong> — plating, serving, dan customer service</li>
+        <li><strong>Pemasaran</strong> — promosi via media sosial, platform online (GrabFood, GoFood), dan word of mouth</li>
+        <li><strong>Penjualan &amp; Pembayaran</strong> — transaksi tunai atau non-tunai (QRIS, kartu debit)</li>
+        <li><strong>Evaluasi &amp; Pengembangan</strong> — analisis omzet, feedback pelanggan, dan inovasi menu</li>
+      </ol>`,
+    kuis: 'k1q3'
+  }
+};
+
+let currentMateriKey = null;
+
+function showMateri(key, btn) {
+  currentMateriKey = key;
+  const data = materiData[key];
+  const box = document.getElementById('box-materi');
+  box.classList.remove('anim-fade'); void box.offsetWidth;
+  box.innerHTML = `${data.content}<button class="quiz-btn" onclick="bukaKuisMateri('${key}')">📝 Kerjakan Kuis →</button>`;
+  box.classList.add('anim-fade');
+  document.querySelectorAll('#content-1 .side-btn').forEach(b => b.classList.remove('active-tab'));
+  if (btn) btn.classList.add('active-tab');
+}
+
+/* ===== QUIZ DATA ===== */
+const quizData = {
+  k1q1: {
+    title: 'Kuis — Definisi Bisnis Industri Kuliner',
+    soal: [
+      { q: 'Bisnis industri kuliner mencakup seluruh proses berikut, KECUALI...', opts: ['Produksi dan pengolahan makanan', 'Penjualan dan distribusi produk', 'Pembuatan pakaian seragam restoran', 'Penyajian dan layanan kepada konsumen'], jawab: 2 },
+      { q: 'Produk kuliner bersifat "perishable" yang artinya...', opts: ['Sangat mahal', 'Cepat rusak atau mudah basi', 'Sulit diolah', 'Bersifat eksklusif'], jawab: 1 },
+      { q: 'Aspek penting dalam industri kuliner yang berkaitan dengan kebersihan dan keamanan makanan disebut...', opts: ['Food Cost', 'Food Safety', 'Food Trend', 'Food Styling'], jawab: 1 },
+    ]
+  },
+  k1q2: {
+    title: 'Kuis — Klasifikasi dan Jenis Industri Kuliner',
+    soal: [
+      { q: 'Dapur produksi yang hanya melayani pesanan online tanpa tempat makan di lokasi disebut...', opts: ['Full Service Restaurant', 'Fast Food', 'Cloud Kitchen', 'Catering Service'], jawab: 2 },
+      { q: 'Warung makan dengan omzet di bawah Rp 300 juta per tahun termasuk kategori usaha kuliner...', opts: ['Usaha Kecil', 'Usaha Menengah', 'Usaha Besar', 'Usaha Mikro'], jawab: 3 },
+      { q: 'Usaha kuliner yang khusus menyajikan makanan untuk event atau acara di luar lokasi usaha disebut...', opts: ['Food Truck', 'Catering Service', 'Bakery Shop', 'Fine Dining'], jawab: 1 },
+    ]
+  },
+  k1q3: {
+    title: 'Kuis — Prinsip dan Alur Bisnis Kuliner',
+    soal: [
+      { q: 'Persentase ideal biaya bahan baku (food cost) dari harga jual dalam bisnis kuliner adalah...', opts: ['5-10%', '15-20%', '30-35%', '50-60%'], jawab: 2 },
+      { q: 'Tahap persiapan sebelum operasional dapur yang mencakup menyiapkan semua bahan dan alat disebut...', opts: ['Mise en Place', 'Plating', 'Serving', 'HACCP'], jawab: 0 },
+      { q: 'Langkah pertama dalam alur bisnis kuliner yang terencana adalah...', opts: ['Pengadaan bahan baku', 'Perencanaan usaha dan riset pasar', 'Pemasaran produk', 'Evaluasi dan pengembangan'], jawab: 1 },
+    ]
+  }
+};
+
+let quizState = {};
+let selectedOpt = -1;
+
+function bukaKuisMateri(key) {
+  const qKey = materiData[key].kuis;
+  quizState = { key: qKey, current: 0, answers: [], score: 0 };
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const quiz = quizData[quizState.key];
+  const q = quiz.soal[quizState.current];
+  const box = document.getElementById('box-materi');
+  box.innerHTML = `
+    <div class="quiz-overlay">
+      <h3>📝 ${quiz.title}</h3>
+      <div class="career-progress-bar">
+        <div class="career-progress-fill" style="width:${((quizState.current)/quiz.soal.length)*100}%"></div>
+      </div>
+      <div class="career-q-num">Soal ${quizState.current+1} dari ${quiz.soal.length}</div>
+      <div class="quiz-q" style="margin-top:12px;">${q.q}</div>
+      <div class="quiz-options" id="quiz-opts">
+        ${q.opts.map((o,i) => `<button class="quiz-opt" data-idx="${i}" onclick="pilihJawaban(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+      </div>
+      <div class="quiz-nav">
+        <button class="quiz-submit" id="btn-submit-quiz" onclick="submitJawaban()" disabled style="opacity:0.5;cursor:not-allowed;">Konfirmasi Jawaban</button>
+      </div>
+    </div>`;
+}
+
+function pilihJawaban(idx) {
+  selectedOpt = idx;
+  document.querySelectorAll('.quiz-opt').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.quiz-opt')[idx].classList.add('selected');
+  const btn = document.getElementById('btn-submit-quiz');
+  btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer';
+}
+
+function submitJawaban() {
+  const quiz = quizData[quizState.key];
+  const q = quiz.soal[quizState.current];
+  const isBenar = selectedOpt === q.jawab;
+  if (isBenar) quizState.score++;
+  quizState.answers.push({ pilihan: selectedOpt, jawaban: q.jawab, benar: isBenar });
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach((b, i) => {
+    if (i === q.jawab) b.classList.add('correct');
+    else if (i === selectedOpt && !isBenar) b.classList.add('wrong');
+  });
+  document.getElementById('btn-submit-quiz').disabled = true;
+  document.getElementById('btn-submit-quiz').textContent = isBenar ? '✅ Benar!' : '❌ Salah!';
+  setTimeout(() => {
+    quizState.current++; selectedOpt = -1;
+    if (quizState.current < quiz.soal.length) renderQuiz();
+    else tampilkanHasilKuis();
+  }, 900);
+}
+
+function tampilkanHasilKuis() {
+  const quiz = quizData[quizState.key];
+  const total = quiz.soal.length;
+  const skor = Math.round((quizState.score / total) * 100);
+  const msg = skor >= 80 ? '🎉 Luar Biasa! Kamu hebat!' : skor >= 60 ? '👍 Bagus! Terus belajar ya!' : '📚 Yuk pelajari lagi materinya!';
+  poin += skor;
+  document.getElementById('poin-val').textContent = poin;
+  document.getElementById('stat-poin').textContent = poin;
+  let stat = parseInt(document.getElementById('stat-selesai').textContent) + 1;
+  document.getElementById('stat-selesai').textContent = stat;
+  document.getElementById('box-materi').innerHTML = `
+    <div class="quiz-score-box">
+      <div style="font-size:36px;margin-bottom:10px;">🏆</div>
+      <div class="score-num">${skor}</div>
+      <div class="score-label">${quizState.score} dari ${total} jawaban benar</div>
+      <div class="score-msg">${msg}</div>
+      <div style="margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="quiz-btn" onclick="ulangiKuis()">🔁 Ulangi Kuis</button>
+        <button class="quiz-btn" style="background:var(--brown);" onclick="kembaliKeMateri()">← Kembali ke Materi</button>
+      </div>
+    </div>`;
+}
+
+function ulangiKuis() {
+  quizState.current = 0; quizState.answers = []; quizState.score = 0; selectedOpt = -1;
+  renderQuiz();
+}
+function kembaliKeMateri() {
+  if (currentMateriKey) showMateri(currentMateriKey, null);
+}
+
+/* ===== MODUL 2: SIMULASI KLASIFIKASI KULINER ===== */
+const kulinerJobs = [
+  { id:'u1', nama:'Warung Makan', icon:'🍛', kat:'tradisional', penjelasan:'Warung makan adalah usaha kuliner tradisional berskala mikro yang menyajikan masakan rumahan dengan harga terjangkau.',
+    img:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="30" width="60" height="35" rx="6" fill="#E8890C"/><rect x="14" y="34" width="52" height="27" rx="4" fill="#FFF3E0"/><path d="M10 30 L40 14 L70 30 Z" fill="#C47008"/><rect x="30" y="48" width="20" height="12" rx="3" fill="#E8890C"/><circle cx="25" cy="42" r="5" fill="#FDD9A0"/><circle cx="55" cy="42" r="5" fill="#FDD9A0"/></svg>` },
+  { id:'u2', nama:'Cloud Kitchen', icon:'📱', kat:'modern', penjelasan:'Cloud Kitchen adalah dapur virtual yang hanya melayani pesanan online melalui platform pesan antar makanan.',
+    img:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect x="22" y="12" width="36" height="56" rx="8" fill="#4A2E0D"/><rect x="26" y="18" width="28" height="38" rx="4" fill="#87CEEB"/><circle cx="40" cy="62" r="3" fill="#E8890C"/><text x="32" y="42" font-size="14" fill="#E8890C">🍜</text></svg>` },
+  { id:'u3', nama:'Fine Dining', icon:'🥂', kat:'premium', penjelasan:'Fine Dining adalah restoran kelas atas yang menawarkan pengalaman makan mewah dengan menu premium dan pelayanan formal.',
+    img:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="28" fill="#F3E5F5"/><circle cx="40" cy="40" r="20" fill="white" stroke="#AB47BC" stroke-width="2"/><rect x="36" y="20" width="2" height="10" rx="1" fill="#AB47BC"/><path d="M30 38 Q40 30 50 38" stroke="#AB47BC" stroke-width="2" fill="none"/><rect x="34" y="46" width="12" height="4" rx="2" fill="#AB47BC"/></svg>` },
+  { id:'u4', nama:'Food Truck', icon:'🚚', kat:'modern', penjelasan:'Food Truck adalah usaha kuliner bergerak yang dapat berpindah lokasi sesuai keramaian atau event tertentu.',
+    img:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="34" width="50" height="28" rx="6" fill="#E53935"/><rect x="56" y="42" width="16" height="20" rx="4" fill="#C62828"/><rect x="14" y="40" width="36" height="16" rx="3" fill="#FFF3E0"/><circle cx="20" cy="64" r="8" fill="#424242"/><circle cx="20" cy="64" r="4" fill="#9E9E9E"/><circle cx="54" cy="64" r="8" fill="#424242"/><circle cx="54" cy="64" r="4" fill="#9E9E9E"/><path d="M56 34 L68 34 L72 46 L56 46 Z" fill="#EF5350"/></svg>` },
+  { id:'u5', nama:'Catering Event', icon:'🎪', kat:'jasa', penjelasan:'Catering Event menyediakan layanan makanan untuk berbagai acara seperti pernikahan, ulang tahun, dan seminar.',
+    img:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="20" width="60" height="40" rx="6" fill="#1565C0"/><rect x="14" y="24" width="52" height="32" rx="4" fill="#E3F2FD"/><rect x="20" y="32" width="16" height="16" rx="3" fill="#1976D2"/><rect x="44" y="32" width="16" height="16" rx="3" fill="#1976D2"/><rect x="32" y="34" width="16" height="6" rx="2" fill="white" opacity=".6"/></svg>` },
+  { id:'u6', nama:'Bakery & Kafe', icon:'☕', kat:'modern', penjelasan:'Bakery dan kafe menawarkan kombinasi produk roti, kue, dan minuman dalam suasana yang nyaman untuk ngobrol.',
+    img:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect x="16" y="28" width="32" height="24" rx="8" fill="#F5CBA7"/><path d="M20 28 Q32 16 44 28" fill="#E59866"/><rect x="48" y="36" width="16" height="20" rx="3" fill="#5D4037"/><ellipse cx="56" cy="36" rx="10" ry="5" fill="#4E342E"/><path d="M52 32 Q56 26 60 32" stroke="white" stroke-width="2" fill="none" opacity=".5"/></svg>` },
+  { id:'u7', nama:'Warung Lesehan', icon:'🪔', kat:'tradisional', penjelasan:'Warung lesehan adalah usaha kuliner tradisional dengan konsep duduk di lantai yang kental dengan nuansa budaya lokal.',
+    img:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="52" width="64" height="6" rx="2" fill="#8D6E63"/><rect x="12" y="36" width="56" height="16" rx="4" fill="#D7CCC8"/><circle cx="28" cy="36" r="8" fill="#FFCC02"/><circle cx="52" cy="36" r="8" fill="#FFCC02"/><rect x="20" y="20" width="40" height="18" rx="6" fill="none" stroke="#8D6E63" stroke-width="2" stroke-dasharray="4"/></svg>` },
+  { id:'u8', nama:'Franchise Kuliner', icon:'🏪', kat:'premium', penjelasan:'Franchise kuliner adalah sistem waralaba yang memungkinkan pengusaha membeli hak menggunakan merek dan sistem bisnis yang sudah terbukti.',
+    img:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="28" width="64" height="40" rx="6" fill="#FF7043"/><rect x="12" y="32" width="56" height="32" rx="4" fill="#FFF3E0"/><rect x="20" y="44" width="12" height="18" rx="3" fill="#FF7043"/><rect x="48" y="44" width="12" height="18" rx="3" fill="#FF7043"/><rect x="34" y="44" width="12" height="10" rx="3" fill="#FFF3E0" stroke="#FF7043" stroke-width="1.5"/><rect x="8" y="22" width="64" height="8" rx="4" fill="#E64A19"/><text x="22" y="30" font-size="10" fill="white" font-weight="bold">FRANCHISE</text></svg>` },
+];
+
+let swipeDropped = {};
+let draggingId = null;
+
+function buildSwipeKuliner() {
+  swipeDropped = {};
+  return `
+  <div class="swipe-wrapper">
+    <h2 style="color:var(--brown);margin-bottom:4px;">🧩 Simulasi Klasifikasi Usaha Kuliner</h2>
+    <p style="font-size:13px;color:var(--text-mid);margin-bottom:16px;">Seret kartu usaha kuliner ke kolom yang tepat: <strong>Tradisional</strong>, <strong>Modern/Digital</strong>, <strong>Premium</strong>, atau <strong>Jasa Kuliner</strong></p>
+
+    <div style="font-size:12px;font-weight:700;color:var(--text-light);margin-bottom:8px;letter-spacing:0.5px;">KARTU USAHA KULINER — SERET KE KOLOM YANG TEPAT ⬇️</div>
+    <div class="swipe-cards-row" id="swipe-source">
+      ${kulinerJobs.map(j => `
+        <div class="job-card" id="${j.id}" draggable="true"
+          ondragstart="dragStart(event,'${j.id}')" ondragend="dragEnd(event)">
+          <div class="job-illus">${j.img}</div>
+          <span class="job-icon">${j.icon}</span>
+          <span>${j.nama}</span>
+        </div>`).join('')}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="dropzone kini" id="drop-tradisional"
+        ondragover="dragOver(event)" ondrop="dropCard(event,'tradisional')" ondragleave="dragLeave(event)">
+        <div class="dropzone-label">🏡 Kuliner Tradisional</div>
+        <div class="dropzone-items" id="items-tradisional"></div>
+      </div>
+      <div class="dropzone depan" id="drop-modern"
+        ondragover="dragOver(event)" ondrop="dropCard(event,'modern')" ondragleave="dragLeave(event)">
+        <div class="dropzone-label">📱 Kuliner Modern/Digital</div>
+        <div class="dropzone-items" id="items-modern"></div>
+      </div>
+      <div class="dropzone" style="border-color:#E65100;background:#FFF3E0;" id="drop-premium"
+        ondragover="dragOver(event)" ondrop="dropCard(event,'premium')" ondragleave="dragLeave(event)">
+        <div class="dropzone-label" style="color:#E65100;">🥂 Kuliner Premium</div>
+        <div class="dropzone-items" id="items-premium"></div>
+      </div>
+      <div class="dropzone" style="border-color:#2E7D32;background:#E8F5E9;" id="drop-jasa"
+        ondragover="dragOver(event)" ondrop="dropCard(event,'jasa')" ondragleave="dragLeave(event)">
+        <div class="dropzone-label" style="color:#2E7D32;">🎪 Jasa Kuliner</div>
+        <div class="dropzone-items" id="items-jasa"></div>
+      </div>
+    </div>
+
+    <button class="swipe-check-btn" onclick="cekSwipe()">🔍 Cek Jawaban</button>
+    <div id="swipe-result-area"></div>
+  </div>`;
+}
+
+function initSwipe() {}
+
+function dragStart(e, id) {
+  draggingId = id;
+  document.getElementById(id).classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragEnd(e) {
+  if (draggingId) document.getElementById(draggingId)?.classList.remove('dragging');
+}
+function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function dropCard(e, zone) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!draggingId) return;
+  const card = document.getElementById(draggingId);
+  if (!card) return;
+  delete swipeDropped[draggingId];
+  const targetItems = document.getElementById('items-' + zone);
+  targetItems.appendChild(card);
+  card.classList.remove('dragging');
+  swipeDropped[draggingId] = zone;
+  draggingId = null;
+}
+
+function cekSwipe() {
+  const resultArea = document.getElementById('swipe-result-area');
+  const totalPlaced = Object.keys(swipeDropped).length;
+  if (totalPlaced < kulinerJobs.length) {
+    resultArea.innerHTML = `<div style="background:#FFF3E0;border:1.5px solid var(--orange);border-radius:12px;padding:14px 18px;margin-top:12px;font-size:13px;color:var(--brown);">⚠️ Masih ada <strong>${kulinerJobs.length - totalPlaced}</strong> kartu yang belum ditempatkan!</div>`;
+    return;
+  }
+  let benar = 0;
+  const html = kulinerJobs.map(j => {
+    const pilihan = swipeDropped[j.id];
+    const isBenar = pilihan === j.kat;
+    if (isBenar) benar++;
+    const katLabel = { tradisional:'Kuliner Tradisional', modern:'Kuliner Modern/Digital', premium:'Kuliner Premium', jasa:'Jasa Kuliner' };
+    return `
+      <div class="swipe-result-item ${isBenar ? 'correct' : 'wrong'}">
+        <div class="res-icon">${isBenar ? '✅' : '❌'}</div>
+        <div>
+          <div class="res-title">${j.icon} ${j.nama} — ${isBenar ? 'Benar!' : 'Salah!'}</div>
+          ${!isBenar ? `<div class="res-exp" style="color:#C62828;">Kamu menjawab: <strong>${katLabel[pilihan]||pilihan}</strong> | Jawaban benar: <strong>${katLabel[j.kat]}</strong></div>` : ''}
+          <div class="res-exp">${j.penjelasan}</div>
+        </div>
+      </div>`;
+  }).join('');
+  const skor = Math.round((benar / kulinerJobs.length) * 100);
+  poin += skor;
+  document.getElementById('poin-val').textContent = poin;
+  document.getElementById('stat-poin').textContent = poin;
+  resultArea.innerHTML = `
+    <div class="swipe-result">
+      <div class="quiz-score-box" style="margin-bottom:10px;">
+        <div style="font-size:32px;">🎯</div>
+        <div class="score-num">${benar}/${kulinerJobs.length}</div>
+        <div class="score-label">Jawaban benar — Skor: ${skor}</div>
+        <div class="score-msg">${skor >= 80 ? '🎉 Keren! Kamu paham klasifikasi kuliner!' : skor >= 50 ? '👍 Lumayan! Coba lagi yuk!' : '📚 Pelajari lagi materi klasifikasinya ya!'}</div>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:var(--brown);margin:8px 0 4px;">Penjelasan Jawaban:</div>
+      ${html}
+      <button class="swipe-check-btn" style="background:var(--red);margin-top:8px;" onclick="resetSwipe()">🔁 Coba Lagi</button>
+    </div>`;
+}
+
+function resetSwipe() {
+  const contentEl = document.getElementById('content-2');
+  contentEl.innerHTML = buildBackBtn() + buildSwipeKuliner();
+  setTimeout(initSwipe, 100);
+}
+
+/* ===== MODUL 3: PROFIL KULINER ===== */
+const kulienerQuestions = [
+  {
+    q: 'Kalau kamu diberikan sebuah dapur dan bahan-bahan makanan, hal pertama yang paling ingin kamu lakukan adalah...',
+    opts: ['Langsung bereksperimen membuat kreasi menu baru yang belum pernah ada', 'Mencatat semua bahan, lalu menghitung biaya dan rencana penjualannya', 'Menyiapkan semuanya dengan rapi dan membuat SOP memasak yang baku', 'Langsung promosi di media sosial dan terima pesanan online']
+  },
+  {
+    q: 'Saat kamu makan di restoran yang kurang memuaskan, reaksi pertamamu adalah...',
+    opts: ['Langsung bayangkan bagaimana kamu akan memperbaiki resep dan penyajiannya', 'Analisis kenapa bisnis ini bisa bertahan dan apa strategi perbaikannya', 'Evaluasi alur pelayanan — di mana proses yang bisa diefisienkan', 'Foto makanannya dan buat ulasan jujur di media sosial']
+  },
+  {
+    q: 'Pekerjaan di bidang kuliner yang paling menarik bagimu adalah...',
+    opts: ['Chef Kreatif yang menciptakan menu-menu inovatif dan unik', 'Pengusaha kuliner yang mengelola dan mengembangkan bisnis makanan', 'Manajer Operasional restoran yang memastikan semua berjalan efisien', 'Food Blogger atau Influencer kuliner yang mereview dan mempromosikan makanan']
+  },
+  {
+    q: 'Kamu lebih suka jika bisnis kulinermu...',
+    opts: ['Dikenal karena keunikan dan kreativitas menunya', 'Berkembang pesat dengan banyak cabang dan omzet tinggi', 'Berjalan dengan sistem yang tertata, konsisten, dan terpercaya', 'Viral di media sosial dan punya banyak pelanggan setia online']
+  },
+  {
+    q: 'Keahlian yang paling ingin kamu kuasai di industri kuliner adalah...',
+    opts: ['Teknik memasak tingkat lanjut dan pengembangan resep', 'Manajemen keuangan dan strategi pengembangan bisnis kuliner', 'Manajemen dapur, inventaris, dan pengendalian kualitas', 'Fotografi makanan, copywriting, dan digital marketing kuliner']
+  }
+];
+
+const kulienerProfiles = [
+  {
+    icon: '👨‍🍳', title: 'The Creative Chef',
+    sub: 'Jiwa Seni & Inovasi Kuliner',
+    desc: 'Kamu adalah seorang inovator kuliner sejati! Kreativitas dan passion dalam memasak adalah kekuatan terbesarmu. Kamu cocok untuk karier sebagai Chef, Pastry Artist, atau Food Researcher.',
+    karier: ['Chef Eksekutif', 'Pastry Chef', 'Food Product Developer', 'Instruktur Kuliner'],
+    bisnis: 'Buka restoran fine dining atau catering premium dengan menu signature yang kamu ciptakan sendiri.',
+    tags: ['Kreatif', 'Inovatif', 'Seniman Kuliner']
+  },
+  {
+    icon: '💼', title: 'The Culinary Entrepreneur',
+    sub: 'Jiwa Bisnis & Kepemimpinan',
+    desc: 'Kamu adalah calon pengusaha kuliner sukses! Naluri bisnismu tajam dan kamu memiliki visi untuk membangun usaha kuliner yang berkembang dan menguntungkan.',
+    karier: ['Pemilik Restoran', 'Franchise Owner', 'Culinary Business Consultant', 'Food Investor'],
+    bisnis: 'Mulai dengan satu konsep restoran yang kuat, lalu kembangkan ke sistem franchise untuk ekspansi cepat.',
+    tags: ['Pemimpin', 'Visioner', 'Pengusaha']
+  },
+  {
+    icon: '⚙️', title: 'The Operations Master',
+    sub: 'Jiwa Manajemen & Sistem',
+    desc: 'Kamu adalah tulang punggung operasional bisnis kuliner! Kemampuanmu dalam mengatur sistem, SOP, dan efisiensi membuat bisnis kuliner berjalan mulus dan konsisten.',
+    karier: ['Manajer Restoran', 'F&B Manager Hotel', 'QC Supervisor Kuliner', 'Kitchen Manager'],
+    bisnis: 'Buka catering atau cloud kitchen dengan sistem manajemen yang ketat untuk memastikan kualitas dan konsistensi.',
+    tags: ['Sistematis', 'Detail', 'Efisien']
+  },
+  {
+    icon: '📱', title: 'The Digital Food Creator',
+    sub: 'Jiwa Konten & Pemasaran Digital',
+    desc: 'Kamu adalah bintang kuliner digital masa kini! Kemampuanmu dalam konten kreatif dan media sosial bisa membawa produk kuliner viral dan dikenal luas.',
+    karier: ['Food Blogger/Vlogger', 'Social Media Manager Kuliner', 'Food Photographer', 'Kuliner Content Creator'],
+    bisnis: 'Bangun personal brand kuliner yang kuat di media sosial, lalu monetisasi melalui endorsement, kelas memasak online, atau jualan produk kuliner sendiri.',
+    tags: ['Digital Savvy', 'Kreatif Konten', 'Influencer']
+  }
+];
+
+let careerAnswers = [];
+let careerCurrent = 0;
+
+function buildProfilKuliner() {
+  careerAnswers = []; careerCurrent = 0;
+  return renderCareerQ();
+}
+
+function renderCareerQ() {
+  const q = kulienerQuestions[careerCurrent];
+  const progress = ((careerCurrent) / kulienerQuestions.length) * 100;
+  return `
+    <div style="max-width:680px;">
+      <h2 style="color:var(--brown);margin-bottom:16px;">🎯 Tes Profil Karier Kuliner</h2>
+      <div class="career-progress-bar">
+        <div class="career-progress-fill" id="career-prog" style="width:${progress}%"></div>
+      </div>
+      <div class="career-q-num">Pertanyaan ${careerCurrent+1} dari ${kulienerQuestions.length}</div>
+      <div class="career-q-text" style="margin-top:12px;">${q.q}</div>
+      <div class="career-options" id="career-opts">
+        ${q.opts.map((o,i) => `<button class="career-opt" onclick="pilihCareer(${i}, this)">${o}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function pilihCareer(idx, btn) {
+  document.querySelectorAll('.career-opt').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(() => {
+    careerAnswers.push(idx);
+    careerCurrent++;
+    const contentEl = document.getElementById('content-3');
+    if (careerCurrent < kulienerQuestions.length) {
+      contentEl.innerHTML = buildBackBtn() + renderCareerQ();
+    } else {
+      contentEl.innerHTML = buildBackBtn() + tampilkanHasilKarier();
+    }
+  }, 400);
+}
+
+function tampilkanHasilKarier() {
+  const count = [0, 0, 0, 0];
+  careerAnswers.forEach(a => count[a]++);
+  const maxIdx = count.indexOf(Math.max(...count));
+  const profil = kulienerProfiles[maxIdx];
+  return `
+    <div class="career-result-card">
+      <div class="career-result-icon">${profil.icon}</div>
+      <div class="career-result-title">${profil.title}</div>
+      <div style="font-size:13px;color:var(--orange);font-weight:700;margin-top:4px;">${profil.sub}</div>
+      <p class="career-result-sub" style="margin-top:12px;">${profil.desc}</p>
+      <div class="career-result-tags">
+        ${profil.tags.map(t => `<span class="career-tag tag-red">${t}</span>`).join('')}
+      </div>
+
+      <div style="margin-top:22px;text-align:left;background:white;border-radius:14px;padding:18px 20px;">
+        <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:10px;">💼 Rekomendasi Karier di Industri Kuliner:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${profil.karier.map(k => `<span class="career-tag tag-orange">${k}</span>`).join('')}
+        </div>
+      </div>
+
+      <div style="margin-top:14px;text-align:left;background:rgba(229,62,62,0.06);border-radius:14px;padding:18px 20px;border:1.5px solid rgba(229,62,62,0.2);">
+        <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:6px;">💡 Ide Peluang Bisnis Kuliner Untukmu:</div>
+        <p style="font-size:13px;color:var(--text-mid);line-height:1.7;">${profil.bisnis}</p>
+      </div>
+
+      <button class="career-next-btn" style="margin-top:20px;" onclick="ulangiProfilKuliner()">🔁 Ulangi Tes</button>
+    </div>`;
+}
+
+function ulangiProfilKuliner() {
+  const contentEl = document.getElementById('content-3');
+  careerAnswers = []; careerCurrent = 0;
+  contentEl.innerHTML = buildBackBtn() + renderCareerQ();
+}
+
+// buildSimulasiBisnis
+function buildSimulasiBisnis(){
+ return `
+ <div style="max-width:700px;margin:auto;">
+   <h2>💰 Simulasi Membuka Bisnis Kuliner</h2>
+
+   <p>Pilih modal awal:</p>
+   <select id="modalSelect">
+     <option value="500000">Rp500.000</option>
+     <option value="1000000">Rp1.000.000</option>
+     <option value="3000000">Rp3.000.000</option>
+   </select>
+
+   <p>Pilih konsep usaha:</p>
+   <select id="usahaSelect">
+     <option value="warung">Warung Makan</option>
+     <option value="streetfood">Street Food</option>
+     <option value="coffee">Coffee Booth</option>
+   </select>
+
+   <button class="quiz-btn" onclick="jalanSimulasi()">Mulai</button>
+
+   <div id="hasilSimulasi"></div>
+ </div>`;
+}
+
+function jalanSimulasi(){
+ let modal=parseInt(document.getElementById('modalSelect').value);
+ let hasil=Math.floor(Math.random()*modal)+200000;
+ let untung=hasil-modal;
+
+ document.getElementById('hasilSimulasi').innerHTML=
+ `
+ <div class="quiz-score-box">
+   <h3>Hasil Hari Pertama</h3>
+   <p>Omzet: Rp${hasil.toLocaleString()}</p>
+   <p>${untung >=0 ? 'Untung' : 'Rugi'}: Rp${Math.abs(untung).toLocaleString()}</p>
+ </div>
+ `;
+}
+
+/* ===== MODUL 4: PROFIL PEMBUAT ===== */
+function buildProfilPembuat() {
+  return `
+  <div class="profil-page">
+    <div class="profil-avatar">👩‍🏫</div>
+    <div class="profil-name">Alfidya Faiz M.Pd.</div>
+    <div class="profil-role">alfidyasfaiz37@gmail.com</div>
+    <div class="profil-info-grid">
+      <div class="profil-info-item">
+        <div class="profil-info-label">Instansi</div>
+        <div class="profil-info-value">SMK Negeri 1 Klaten</div>
+      </div>
+      <div class="profil-info-item">
+        <div class="profil-info-label">Jenjang Pendidikan</div>
+        <div class="profil-info-value">S2 Pendidikan Bahasa Indonesia</div>
+      </div>
+    </div>
+    <div style="background:var(--cream);border:1.5px solid var(--border);border-radius:14px;padding:18px 22px;max-width:580px;width:100%;margin-bottom:20px;text-align:center;">
+      <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:8px;">📚 Tentang Media Pembelajaran Ini</div>
+      <p style="font-size:12px;color:var(--text-mid);line-height:1.7;">
+        Dapur Ilmu dirancang sebagai bahan ajar interaktif berbasis web yang memadukan teori, kuis, simulasi drag &amp; drop, dan tes profil karier kuliner.
+        Dikembangkan menggunakan pendekatan <em>Project-Based Learning</em> sesuai standar Kurikulum Merdeka Vokasi untuk mempersiapkan
+        peserta didik menghadapi tantangan dunia industri kuliner masa depan.
+      </p>
+    </div>
+    <button class="btn-back-dashboard" onclick="backDashboard()" style="margin:0;">← Kembali ke Dashboard</button>
+  </div>`;
+}
+
+/* ===== INIT ===== */
+window.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('activeView') === 'dashboard') {
+    document.getElementById('section-thumbnail').style.display = 'none';
+    document.getElementById('section-intro').style.display = 'none';
+    document.getElementById('page-dashboard').style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>
